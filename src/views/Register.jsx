@@ -17,7 +17,7 @@ function Register() {
             .required('กรุณาใส่อีเมล...'),
         userPassword: Yup.string()
             .min(6, 'รหัสผ่านต้องมีอย่างน้อย 6 ตัว')
-            .matches(/^[^'";]*$/, 'รหัสผ่านมีอัครพิเศษที่ไม่ได้รับอนุญาต')
+            .matches(/^[a-zA-Z0-9^'";]*$/, 'รหัสผ่านมีอัครพิเศษที่ไม่ได้รับอนุญาต')
             .required('กรุณาใส่รหัสผ่าน...'),
         userPasswordConfirm: Yup.string()
             .oneOf([Yup.ref('userPassword'), null], 'รหัสผ่านไม่ตรงกัน')

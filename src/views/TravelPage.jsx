@@ -121,7 +121,7 @@ function TravelPage() {
       const response = await axios.get(`https://n8n-bb7z.onrender.com/webhook/c502a429-0ea4-4c9f-a86d-5bc928db036d/at/trip-page/comment/del/${commentId}`);
       console.log(response.data);
       setCommentS((prevCommentS) => prevCommentS.filter((comment) => comment.commentId !== commentId));
-    }catch (error) {
+    } catch (error) {
       console.error(error);
     }
   }
@@ -133,6 +133,18 @@ function TravelPage() {
   const UploaderImageUrl = trip?.userImage
     ? `https://yxkmuhpwtkslojxocvxo.supabase.co/storage/v1/object/public/atimage/user/${trip?.userImage}`
     : 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'ไม่ระบุ'; // ถ้าไม่มีค่า คืนข้อความเลย
+
+    const monthsThai = [
+      'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
+      'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
+    ];
+
+    const [year, month, day] = dateString.split('-');
+    return `${parseInt(day)} ${monthsThai[parseInt(month) - 1]} ${year}`;
+  };
 
   return (
     <Box sx={{ backgroundColor: '#FFF3E0', minHeight: '100vh', py: 6 }}>
@@ -205,14 +217,14 @@ function TravelPage() {
                 sx={{
                   position: 'relative',
                   bgcolor: '#f8f8f8',
-                  height: 100,
+                  height: 140, // เดิม 100 → เพิ่มเป็น 140
                   width: '100%',
                   borderRadius: 2,
                   mt: 2,
                   border: '1px dashed #bbb',
                   display: 'flex',
                   alignItems: 'start',
-                  padding: 3
+                  padding: 4, // เดิม 3 → เพิ่มเป็น 4
                 }}
               >
                 <Typography variant="body1" fontWeight="bold" color="text.secondary">
@@ -223,22 +235,25 @@ function TravelPage() {
               <Box
                 sx={{
                   display: 'flex',
-                  flexDirection: { xs: 'column', sm: 'row' },
-                  gap: { xs: 1, sm: 8, md: 16 },
-                  mt: 3,
+                  flexDirection: 'column',
+                  gap: 1,
+                  mt: 2,
                 }}
               >
-                <Typography variant="subtitle1" fontWeight="bold" color="primary">
-                  ยอดเข้าชม: {trip?.tripViews ?? 0}
+                <Typography sx={{ fontSize: '14px' }}>
+                  ค่าใช้จ่าย : {trip?.tripCost ? `${trip.tripCost} บาท` : 'ไม่ระบุ'}
                 </Typography>
-                <Typography variant="subtitle1" fontWeight="bold" color="primary">
-                  ค่าใช้จ่าย: {trip?.tripCost ? `${trip.tripCost} บาท` : 'ไม่ระบุ'}
+                <Typography sx={{ fontSize: '14px' }}>
+                  วันที่เริ่มทริป : {formatDate(trip?.tripStartDate)}
                 </Typography>
-              </Box>
-
-              <Box sx={{ mt: 4 }}>
-                <Typography variant="subtitle1" fontWeight="bold" color="text.secondary">
-                  อัพโหลดเมื่อ: {trip?.createdAt ? new Date(trip.createdAt).toLocaleDateString('th-TH') : 'ไม่ระบุ'}
+                <Typography sx={{ fontSize: '14px' }}>
+                  วันที่จบทริป : {formatDate(trip?.tripEndDate)}
+                </Typography>
+                <Typography sx={{ fontSize: '14px' }}>
+                  ยอดเข้าชม : {trip?.tripViews ?? 0} ครั้ง
+                </Typography>
+                <Typography sx={{ fontSize: '14px' }}>
+                  อัพโหลดเมื่อ : {formatDate(trip?.createdAt)}
                 </Typography>
               </Box>
             </Box>
@@ -252,7 +267,7 @@ function TravelPage() {
             gutterBottom
             sx={{ whiteSpace: 'pre-line', lineHeight: 1.8 }}
           >
-            คำอธิบาย : {trip?.tripDesc ?? 'ไม่ระบุ'}
+            รายละเอียด : {trip?.tripDesc ?? 'ไม่ระบุ'}
           </Typography>
         </Box>
 
@@ -329,7 +344,7 @@ function TravelPage() {
               </Button>
             </Box>
             <Box sx={{ mt: 3 }}>
-              { commentS.map((commentS) => (
+              {commentS.map((commentS) => (
                 <Box key={commentS.commentId} sx={{
                   display: 'flex',
                   flexDirection: isEditing === commentS.commentId ? 'column' : 'row',
@@ -364,10 +379,13 @@ function TravelPage() {
                     </Box>
                     {isEditing === commentS?.commentId ? (
                       <>
-                        <TextField fullWidth value={editComment} onChange={(e) => setEditComment(e.target.value)} />
+                        <TextField
+                          fullWidth
+                          value={editComment}
+                          onChange={(e) => setEditComment(e.target.value)} />
                         <Button sx={{ mt: 1 }}
                           onClick={() => handleUpdateComment(commentS?.commentId)}
-                          disabled={!editComment.trim()}
+                          disabled={!editComment.trim() || commentS?.commentText === editComment}
                         >
                           บันทึก
                         </Button>
@@ -390,7 +408,12 @@ function TravelPage() {
                   ) : (
                     String(userData?.userId) === String(commentS?.userId) && (
                       <Box sx={{ alignSelf: 'center', ml: 'auto' }}>
-                        <IconButton onClick={() => setIsEditing(commentS?.commentId)}><EditIcon /></IconButton>
+                        <IconButton onClick={() => {
+                          setIsEditing(commentS?.commentId);
+                          setEditComment(commentS?.commentText);
+                        }}>
+                          <EditIcon />
+                        </IconButton>
                         <IconButton onClick={() => handleDeleteComment(commentS?.commentId)}><DeleteIcon /></IconButton>
                       </Box>
                     )

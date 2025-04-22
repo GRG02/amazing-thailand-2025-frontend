@@ -11,9 +11,14 @@ function EditProfile() {
     const [userImage, setUserImage] = useState(null);
     const [userData, setUserData] = useState(null);
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         const storedUserData = localStorage.getItem('userData');
-        if (storedUserData) {
+        if (!storedUserData) {
+            alert('กรุณาเข้าสู่ระบบก่อน');
+            navigate('/login');
+        } else {
             setUserData(JSON.parse(storedUserData));
         }
 
@@ -28,6 +33,8 @@ function EditProfile() {
         };
     }, []);
 
+    console.log(userData);
+
     const validationSchema = Yup.object({
         userName: Yup.string()
             .matches(/^[a-zA-Z0-9]*$/, 'ชื่อผู้ใช้สามารถพิมพ์ได้แค่พยัญชนะภาษาอังกฤษและตัวเลขเท่านั้น')
@@ -37,33 +44,59 @@ function EditProfile() {
             .matches(/^[^'";]*$/, 'อีเมลมีอัครพิเศษที่ไม่ได้รับอนุญาต')
             .required('กรุณาใส่อีเมล...'),
         userPassword: Yup.string()
-            .min(6, 'รหัสผ่านต้องมีอย่างน้อย 6 ตัว')
-            .matches(/^[^'";]*$/, 'รหัสผ่านมีอัครพิเศษที่ไม่ได้รับอนุญาต')
-            .required('กรุณาใส่รหัสผ่าน...'),
+            .nullable()
+            .notRequired()
+            .test(
+                'password-validation',
+                'รหัสผ่านต้องมีอย่างน้อย 6 ตัว และไม่มีอักขระพิเศษที่ไม่ได้รับอนุญาต',
+                (value) => {
+                    if (!value) return true;
+                    const isValidLength = value.length >= 6;
+                    const isValidChars = /^[a-zA-Z0-9^'";]*$/.test(value);
+                    return isValidLength && isValidChars;
+                }
+            ),
+
         userPasswordConfirm: Yup.string()
-            .oneOf([Yup.ref('userPassword'), null], 'รหัสผ่านไม่ตรงกัน')
-            .required('กรุณายืนยันรหัสผ่าน...'),
+            .oneOf([Yup.ref('userPassword'), null], 'รหัสผ่านไม่ตรงกัน'),
+
     });
 
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        reset,
+        formState: { errors, isDirty },
     } = useForm({
         resolver: yupResolver(validationSchema),
     });
 
+    useEffect(() => {
+        if (userData) {
+            reset({
+                userName: userData.userName || '',
+                userEmail: userData.userEmail || '',
+            });
+        }
+    }, [userData, reset]);
+
     const onSubmit = async (data) => {
-        console.log(data);
+
+        if (!isDirty && !userImage) {
+            alert('ยังไม่มีการแก้ไขข้อมูล');
+            return;
+        }
+
 
         const formData = new FormData();
         formData.append('userName', data.userName);
         formData.append('userEmail', data.userEmail);
-        formData.append('userPassword', data.userPassword);
-        formData.append('oldImage', userData.userImage);
-
+        if (data.userPassword && data.userPassword.trim() !== '') {
+            formData.append('userPassword', data.userPassword);
+        }
         if (userImage) {
             formData.append('userImage', userImage);
+            formData.append('oldImage', userData.userImage);
         }else{
             formData.append('userImage', userData.userImage);
         }
@@ -83,6 +116,7 @@ function EditProfile() {
             localStorage.setItem('userData', JSON.stringify(response.data));
             window.dispatchEvent(new Event('storage'));
             alert('แก้ไขข้อมูลสําเร็จ');
+            navigate('/');
         } catch (error) {
             alert('เกิดข้อผิดพลาดในการส่งข้อมูล');
         }
@@ -108,7 +142,7 @@ function EditProfile() {
     });
 
     return (
-        <Box sx={{ backgroundColor: '#f2f2f2', minHeight: '100vh', py: 8, backgroundImage: 'url("https://www.transparenttextures.com/patterns/diamond-upholstery.png")',}}>
+        <Box sx={{ backgroundColor: '#f2f2f2', minHeight: '100vh', py: 8, backgroundImage: 'url("https://www.transparenttextures.com/patterns/diamond-upholstery.png")', }}>
             <Container maxWidth="lg">
                 <Box
                     sx={{
@@ -180,8 +214,7 @@ function EditProfile() {
                             </Typography>
                             <form onSubmit={handleSubmit(onSubmit)}>
                                 <TextField
-                                    defaultValue={userData && userData.userName}
-                                    label="ชื่อ - นามสกุล"
+                                    label="ชื่อผู้ใช้"
                                     variant="outlined"
                                     fullWidth
                                     size="large"
@@ -189,9 +222,9 @@ function EditProfile() {
                                     {...register('userName')}
                                     error={!!errors.userName}
                                     helperText={errors.userName?.message}
+                                    InputLabelProps={{ shrink: true }}
                                 />
                                 <TextField
-                                    defaultValue={userData && userData.userEmail}
                                     label="อีเมล"
                                     type="email"
                                     variant="outlined"
@@ -201,6 +234,7 @@ function EditProfile() {
                                     {...register('userEmail')}
                                     error={!!errors.userEmail}
                                     helperText={errors.userEmail?.message}
+                                    InputLabelProps={{ shrink: true }}
                                 />
                                 <TextField
                                     label="รหัสผ่าน"

@@ -166,7 +166,7 @@ function SearchPage() {
     <>
       <Grid container spacing={2} sx={grid}>
         <Grid size={{ xds: 12, sm: 6, md: 3 }}>
-          <Box sx={sort}>
+          <Box sx={{ ...sort, px: 2 }}>
             <Button variant="contained" fullWidth sx={upload_travel_bt}
               onClick={() => {
                 if (!userData) {
@@ -274,8 +274,8 @@ function SearchPage() {
                       src={`https://yxkmuhpwtkslojxocvxo.supabase.co/storage/v1/object/public/atimage/trip/${trip.tripImage}`}
                       sx={{ width: '100%', height: '50%', objectFit: 'cover' }}
                     />
-                    <Box sx={{ padding: 2, backgroundColor: '', width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-                      <Typography sx={{ fontSize: '20px', fontWeight: 'bold' }}>{trip.tripPlace}</Typography>
+                    <Box sx={{ padding: 1, backgroundColor: '', width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                      <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>{trip.tripPlace}</Typography>
                       <Box sx={{ height: '10px' }} />
                       <Typography sx={{ fontSize: '14px' }}>จังหวัด - {trip.tripProvince}</Typography>
                       <Typography sx={{ fontSize: '14px' }}>ค่าใช้จ่าย - {trip.tripCost ? trip.tripCost : 'ไม่เปิดเผยค่าใช้จ่าย'} บาท</Typography>
@@ -299,7 +299,7 @@ function SearchPage() {
                           รายละเอียด : {trip.tripDesc ? trip.tripDesc : 'ไม่มีรายละเอียด'}
                         </Typography>
                       </Box>
-                      <Box sx={{ backgroundColor: 'orange', width: '100%', mt: 'auto', display: 'flex', justifyContent: 'row', p: 0.5, borderRadius: '10px' }}>
+                      <Box sx={{ backgroundColor: 'orange', width: '100%', mt: 'auto', display: 'flex', justifyContent: 'row', p: 0.5, borderRadius: '25px' }}>
                         <Box sx={{ display: 'flex', justifyContent: 'row', alignItems: 'center' }}>
                           <Avatar src={ViewImg} sx={{ width: '25px', height: '25px' }} />
                           <Typography sx={{ fontSize: '14px', ml: 0.5 }}>Views: {trip.tripViews}</Typography>

@@ -27,10 +27,14 @@ const keywordsList = [
 function AddTravel() {
     const [selectedImage, setSelectedImage] = useState(null)
     const [userData, setUserData] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const storedUserData = localStorage.getItem('userData');
-        if (storedUserData) {
+        if (!storedUserData) {
+            alert('กรุณาเข้าสู่ระบบก่อน');
+            navigate('/login');
+        } else {
             setUserData(JSON.parse(storedUserData));
         }
     }, []);
@@ -76,8 +80,6 @@ function AddTravel() {
         resolver: yupResolver(validationSchema),
         mode: 'all',
     });
-
-    const navigate = useNavigate();
 
     const onSubmit = async (data) => {
         if (!selectedImage) {
@@ -143,8 +145,8 @@ function AddTravel() {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            
-            <Box sx={{ backgroundColor: '#FFF3E0', minHeight: '100vh', py: 6,backgroundImage: 'url("https://www.transparenttextures.com/patterns/diamond-upholstery.png")', }}>
+
+            <Box sx={{ backgroundColor: '#FFF3E0', minHeight: '100vh', py: 6, backgroundImage: 'url("https://www.transparenttextures.com/patterns/diamond-upholstery.png")', }}>
                 <Box
                     sx={{
                         backgroundColor: '#ffffff',
@@ -153,7 +155,7 @@ function AddTravel() {
                         p: 5,
                         borderRadius: 4,
                         boxShadow: '0px 6px 20px rgba(0,0,0,0.1)',
-                        
+
                     }}
                 >
                     <Typography

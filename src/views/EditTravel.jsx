@@ -32,7 +32,10 @@ function EditTravel() {
 
     useEffect(() => {
         const storedUserData = localStorage.getItem('userData');
-        if (storedUserData) {
+        if (!storedUserData) {
+            alert('กรุณาเข้าสู่ระบบก่อน');
+            navigate('/login');
+        } else {
             setUserData(JSON.parse(storedUserData));
         }
     }, []);
@@ -111,7 +114,7 @@ function EditTravel() {
                 tripStartDate: trip.tripStartDate || '',
                 tripEndDate: trip.tripEndDate || '',
                 tripDesc: trip.tripDesc || '',
-              });
+            });
         }
     }, [trip, reset]);
 
@@ -119,7 +122,7 @@ function EditTravel() {
 
     const onSubmit = async (data) => {
 
-        if(!isDirty && !selectedImage){
+        if (!isDirty && !selectedImage) {
             alert('ยังไม่มีการแก้ไขข้อมูล');
             return;
         }
@@ -142,10 +145,10 @@ function EditTravel() {
         formData.append('tripEndDate', data.tripEndDate);
         formData.append('tripDesc', data.tripDesc);
         formData.append('userId', userData.userId);
-        if(selectedImage){
+        if (selectedImage) {
             formData.append('tripImage', selectedImage);
             formData.append('oldImage', trip.tripImage);
-        }else{
+        } else {
             formData.append('tripImage', trip.tripImage);
         }
 
@@ -193,7 +196,7 @@ function EditTravel() {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <Box sx={{ backgroundColor: '#FFF3E0', minHeight: '100vh', py: 6, backgroundImage: 'url("https://www.transparenttextures.com/patterns/diamond-upholstery.png")',     }}>
+            <Box sx={{ backgroundColor: '#FFF3E0', minHeight: '100vh', py: 6, backgroundImage: 'url("https://www.transparenttextures.com/patterns/diamond-upholstery.png")', }}>
                 <Box
                     sx={{
                         backgroundColor: '#ffffff',
@@ -226,7 +229,7 @@ function EditTravel() {
                                         ? URL.createObjectURL(selectedImage)
                                         : (trip && trip.tripImage !== 'null')
                                             ? `https://yxkmuhpwtkslojxocvxo.supabase.co/storage/v1/object/public/atimage/trip/${trip.tripImage}`
-                                            : 'https://cdn-icons-png.flaticon.com/512/847/847969.png'
+                                            : undefined
                                 }
                                 sx={{
                                     width: '100%',

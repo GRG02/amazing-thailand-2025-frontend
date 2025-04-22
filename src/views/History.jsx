@@ -6,7 +6,10 @@ function History() {
 
     useEffect(() => {
         const storedUserData = localStorage.getItem('userData');
-        if (storedUserData) {
+        if (!storedUserData) {
+            alert('กรุณาเข้าสู่ระบบก่อน');
+            navigate('/login');
+        } else {
             setUserData(JSON.parse(storedUserData));
         }
     }, []);
