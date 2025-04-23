@@ -57,20 +57,8 @@ function EditProfile() {
                 }
             ),
 
-        //userPasswordConfirm: Yup.string()
-            //.oneOf([Yup.ref('userPassword'), null], 'รหัสผ่านไม่ตรงกัน'),
-        const passwordConfirmSchema = Yup.string()
-  .oneOf([Yup.ref('userPassword')], 'รหัสผ่านไม่ตรงกัน')
-  .required('กรุณายืนยันรหัสผ่าน');
-
-userPasswordConfirm: Yup.string().when('userPassword', {
-  is: (val) => val && val.length > 0,
-  then: passwordConfirmSchema,
-  otherwise: Yup.string().notRequired()
-});
-
-
-
+        userPasswordConfirm: Yup.string()
+            .oneOf([Yup.ref('userPassword'), null], 'รหัสผ่านไม่ตรงกัน'),
     });
 
     const {
