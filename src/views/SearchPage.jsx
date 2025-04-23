@@ -272,7 +272,11 @@ function SearchPage() {
                     <Avatar
                       variant="square"
                       src={`https://yxkmuhpwtkslojxocvxo.supabase.co/storage/v1/object/public/atimage/trip/${trip.tripImage}`}
-                      sx={{ width: '100%', height: '50%', objectFit: 'cover' }}
+                      sx={{
+                        width: '100%',
+                        height: 200, // fix สูงแค่รูป ไม่เกินนี้
+                        objectFit: 'cover'
+                      }}
                     />
                     <Box sx={{ padding: 1, backgroundColor: '', width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
                       <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>{trip.tripPlace}</Typography>
@@ -401,14 +405,14 @@ const travel_card = {
   flexDirection: 'column',
   justifyContent: 'start',
   alignItems: 'start',
-  height: '50vh',
   width: '100%',
+  minHeight: '100%', // แทน 50vh ใช้ minHeight เผื่อให้มันไม่เล็กเกิน
   borderRadius: '25px',
   overflow: 'hidden',
   cursor: 'pointer',
   '&:hover': {
     transform: 'scale(0.98)',
     opacity: '0.8',
-    transition: '0.5s',
+    transition: '0.3s',
   }
-} 
+};
